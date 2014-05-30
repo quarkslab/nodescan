@@ -1,0 +1,4 @@
+nodescan
+========
+
+Asynchronous scanning library
