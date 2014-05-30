@@ -19,17 +19,17 @@ These libraries needs to be installed:
 
 Under debian based system, you can do:
 
-  # apt-get install boost-{python,random,log}-dev
+    # apt-get install boost-{python,random,log}-dev
 
 
 To build it, follow these instructions:
 
- $ cd /path/to/source
- $ mkdir build
- $ cd build
- $ cmake -DCMAKE_BUILD_TYPE=release ..
- $ make
- $ sudo make install
+    $ cd /path/to/source
+    $ mkdir build
+    $ cd build
+    $ cmake -DCMAKE_BUILD_TYPE=release ..
+    $ make
+    $ sudo make install
 
 
 Usage
