@@ -12,7 +12,7 @@ Installation
 
 These libraries needs to be installed:
 
-* libleeloo: refer to https://github.com/quarkslab/libleeloo
+* libleeloo: refer to [https://github.com/quarkslab/libleeloo]. It needs to be compiled with boost serialization support (see libleeloo's README for more informations)
 * boost-python
 * boost-random
 * boost-log
