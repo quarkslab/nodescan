@@ -1,0 +1,8 @@
+#ifndef NS_CONFIG_H_IN
+#define NS_CONFIG_H_IN
+
+#if @NODESCAN_USE_LOG@
+#define USE_BOOST_LOG
+#endif
+
+#endif

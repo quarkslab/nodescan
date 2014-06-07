@@ -42,25 +42,15 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include <boost/log/trivial.hpp>
-#include <boost/log/attributes/scoped_attribute.hpp>
-#include <boost/log/attributes/named_scope.hpp>
-
 #include <iostream>
 
 #include <ns/async_engine.h>
 #include <ns/host_state_machine.h>
 #include <ns/ipstr.h>
 #include <ns/target.h>
-
+#include <ns/log.h>
 
 #define MAX_EVENTS 1024
-
-#ifdef NDEBUG
-#define _D(...)
-#else
-#define _D(a) a
-#endif
 
 static uint32_t socket_bytes_avail(int s)
 {

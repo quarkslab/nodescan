@@ -31,11 +31,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <boost/log/trivial.hpp>
-#include <boost/log/attributes/scoped_attribute.hpp>
-#include <boost/log/attributes/named_scope.hpp>
-
 #include <ns/lvl4_state_machine.h>
+#include <ns/log.h>
 
 ns::Lvl4SM::Lvl4SM():
 	_reconnect(false),
@@ -49,14 +46,14 @@ ns::Lvl4SM::~Lvl4SM()
 
 bool ns::Lvl4SM::process_lvl4_data(int s, uint32_t navail, Target const& target, HostSM& hsm)
 {
-	BOOST_LOG_NAMED_SCOPE("Lvl4SM::process_lvl4_data");
+	_D(BOOST_LOG_NAMED_SCOPE("Lvl4SM::process_lvl4_data"));
 
 	uint32_t prev_pos = _buf.size();
 	unsigned char* buf_read = _buf.grow_by(navail);
 	int nread = read(s, buf_read, navail);
 	if (nread <= 0) {
 		// TODO: callback
-		BOOST_LOG_TRIVIAL(trace) << s << "invalid read size: " << strerror(errno) << std::endl;
+		_D(BOOST_LOG_TRIVIAL(trace) << s << "invalid read size: " << strerror(errno) << std::endl);
 		return false;
 	}
 	int ret;

@@ -15,6 +15,9 @@ set(SRC_FILES
 	protocols/sip.cpp
 )
 
+set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/include/ns/config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/ns/config.h.in ${CONFIG_H})
+
 set(HEADER_DIST_FILES
 	include/ns/action.h
 	include/ns/async_engine.h
@@ -40,6 +43,8 @@ set(HEADER_DIST_FILES
 	include/ns/protocols/ssh.h
 	include/ns/protocols/ssl.h
 	include/ns/protocols/ssl_structs.h
+
+	${CONFIG_H}
 )
 
 add_library(nodescan SHARED ${SRC_FILES})
