@@ -126,6 +126,15 @@ void lvl4sm_set_size_data_trigger(ns::Lvl4SM& lvl4sm, size_t const n, boost::pyt
 		});
 }
 
+void lvl4sm_set_on_connect(ns::Lvl4SM& lvl4sm, boost::python::object const& f)
+{
+	lvl4sm.set_on_connect(
+		[f](ns::ConnectedTarget const& target, ns::Lvl4SM& lvl4sm_, ns::HostSM& hsm) -> bool
+		{
+			return extract<bool>(f(target, boost::ref(lvl4sm_), boost::ref(hsm)));
+		});
+}
+
 void lvl4sm_set_python_data_trigger(ns::Lvl4SM& lvl4sm, boost::python::object const& obj)
 {
 	lvl4sm.set_trigger<ns::PythonDataTrigger>(obj);
@@ -303,6 +312,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 
 	class_<ns::Lvl4SM, boost::noncopyable>("Lvl4SM")
 		.def("set_reconnect", &ns::Lvl4SM::set_reconnect)
+		.def("set_on_connect", lvl4sm_set_on_connect)
 		.def("reconnect", &ns::Lvl4SM::reconnect)
 		.def("set_char_data_trigger", lvl4sm_set_char_data_trigger)
 		.def("set_size_data_trigger", lvl4sm_set_size_data_trigger)
