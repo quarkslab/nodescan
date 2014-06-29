@@ -10,7 +10,7 @@ ports.add(pyleeloo.port(80, pyleeloo.protocol.TCP))
 
 targets = pynodescan.IPV4TargetSet(ips, ports)
 
-engine = pynodescan.AsyncEngine(targets)
+engine = pynodescan.AsyncEngine(targets, 100, 1)
 
 class Callable:
     def __init__(self, method):
