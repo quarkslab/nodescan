@@ -171,8 +171,8 @@ boost::shared_ptr<Lvl4PythonPropertiesStorage> python_properties_init(object con
 void (ns::AsyncEngine::*async_engine_save_state)(const char* file) = &ns::AsyncEngine::save_state;
 void (ns::AsyncEngine::*async_engine_restore_state)(const char* file) = &ns::AsyncEngine::restore_state;
 
-void (ns::TargetSet::*target_set_save_state)(const char* file) = &NSTargetSetWrap::save_state;
-void (ns::TargetSet::*target_set_restore_state)(const char* file) = &ns::TargetSet::restore_state;
+//void (ns::TargetSet::*target_set_save_state)(const char* file) = &NSTargetSetWrap::save_state;
+//void (ns::TargetSet::*target_set_restore_state)(const char* file) = &ns::TargetSet::restore_state;
 
 struct PythonProtocols
 { };
