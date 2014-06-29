@@ -32,6 +32,7 @@
 #define NS_ACTION_H
 
 #include <functional>
+#include <cstdint>
 
 namespace ns {
 
