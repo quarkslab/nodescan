@@ -26,6 +26,3 @@ target_link_libraries(sip nodescan tbb)
 
 add_executable(target_set target_set.cpp)
 target_link_libraries(target_set nodescan)
-
-add_executable(tracker tracker.cpp)
-target_link_libraries(tracker nodescan)
