@@ -30,7 +30,6 @@
 
 #include <boost/python.hpp>
 
-
 #include <ns/async_engine.h>
 #include <ns/action.h>
 #include <ns/target_set.h>
@@ -39,6 +38,7 @@
 #include <ns/protocols/ssh.h>
 #include <ns/protocols/ssl.h>
 #include <ns/protocols/sip.h>
+
 
 namespace nsp = ns::protocols;
 
@@ -49,7 +49,17 @@ static object object_from_ro_mem(unsigned char* buf, size_t const n)
 #if PY_VERSION_HEX < 0x03000000
 	return boost::python::object(boost::python::handle<>(PyBuffer_FromReadWriteMemory((void*) buf, n)));
 #else
+#if PY_VERSION_HEX < 0x03030000
+	Py_buffer buffer;
+	int res = PyBuffer_FillInfo(&buffer, 0, buf, n, true, PyBUF_CONTIG_RO);
+	if (res == -1) {
+		PyErr_Print();
+		return boost::python::object();
+	}
+	return boost::python::object(boost::python::handle<>(PyMemoryView_FromBuffer(&buffer)));
+#else
 	return boost::python::object(boost::python::handle<>(PyMemoryView_FromMemory((char*) buf, n, PyBUF_READ)));
+#endif
 #endif
 }
 
