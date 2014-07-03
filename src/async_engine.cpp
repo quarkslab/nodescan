@@ -262,8 +262,7 @@ bool ns::AsyncEngine::process_free_socks()
 				if (errno == EINPROGRESS) {
 					break;
 				}
-				callback_finish(target_from_socket(s), errno);
-				free_socket(s);
+				socket_finished(s, errno);
 				_D(BOOST_LOG_TRIVIAL(trace) << s << " Error connecting to " << ipstr(cur_target.ipv4()) << ": " << errno << " " << strerror(errno) << std::endl);
 			}
 		}

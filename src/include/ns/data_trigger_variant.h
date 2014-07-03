@@ -52,6 +52,11 @@ public:
 		new (storage()) DataTrigger();
 	}
 
+	~DataTriggerVariant()
+	{
+		storage()->~DataTrigger();
+	}
+
 public:
 	template <class T, typename... Args>
 	inline void set(Args && ... args)
