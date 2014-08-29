@@ -48,7 +48,7 @@ set(HEADER_DIST_FILES
 )
 
 add_library(nodescan SHARED ${SRC_FILES})
-target_link_libraries(nodescan leeloo ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(nodescan leeloo ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${TBB_LIBRARIES}) 
 
 install(TARGETS nodescan LIBRARY DESTINATION lib)
 install(FILES ${HEADER_DIST_FILES} DESTINATION include/ns)

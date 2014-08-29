@@ -15,5 +15,9 @@ endif()
 find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package(TBB REQUIRED)
+
 include_directories(${BOOST_LIBRARIES})
 include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories(${TBB_INCLUDE_DIRS})
