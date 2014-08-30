@@ -7,7 +7,7 @@ find_package(PythonLibs ${PYTHON_VERSION} REQUIRED)
 set(PythonInterp_FIND_VERSION ${PYTHON_VERSION})
 find_package(PythonInterp)
 
-set(BOOST_COMPONENTS python-py${PYTHON_VERSION_BOOST} random)
+set(BOOST_COMPONENTS python-py${PYTHON_VERSION_BOOST} random serialization)
 if(NODESCAN_USE_LOG)
 	set(BOOST_COMPONENTS ${BOOST_COMPONENTS} log)
 endif()
