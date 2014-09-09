@@ -28,21 +28,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef NS_TARGET_SET_H
-#define NS_TARGET_SET_H
+#ifndef NS_TARGET_FILE_H
+#define NS_TARGET_FILE_H
 
-#include <ns/target.h>
+#include <ns/target_set.h>
 
-#include <leeloo/ip_list_intervals.h>
-#include <leeloo/port_list_intervals.h>
-#include <leeloo/list_intervals_random.h>
-#include <leeloo/uni.h>
+#include <leeloo/port.h>
 
 namespace ns {
 
 class Engine;
 class HostSM;
 
+#if 0
 class TargetFile: public TargetSet
 {
 	friend class Engine;
@@ -71,6 +69,45 @@ private:
 	boost::shared_ptr<std::istream> _storage;
 	std::istream* _stream;
 	size_t _cur_line;
+};
+#endif
+
+class TargetAsyncFile: public TargetSet
+{
+public:
+	TargetAsyncFile(int fd, leeloo::port const& def_port);
+
+public:
+	virtual void init() override;
+	virtual void init_shrd(uint32_t shrd_idx, uint32_t shrd_count) override;
+
+	virtual void save_state(const char*) override { };
+	virtual void restore_state(const char*) override { };
+
+	virtual void save_state(std::ostream&) override { };
+	virtual void restore_state(std::istream&) override { };
+
+	virtual Target next_target() override;
+
+	virtual bool target_finished(Target const&, HostSM&) override
+	{
+		return true;
+	}
+
+private:
+	inline int fd() const { return _fd; }
+	Target next_target_in_buf();
+
+private:
+	Lvl4Buffer _buf;
+	int _fd;
+	leeloo::port _def_port;
+};
+
+class TargetStdin: public TargetAsyncFile
+{
+public:
+	TargetStdin(leeloo::port const& def_port);
 };
 
 }

@@ -246,37 +246,42 @@ bool ns::AsyncEngine::process_free_socks()
 	std::vector<int>::const_iterator it_socks;
 	_D(BOOST_LOG_TRIVIAL(trace) << "begin free socks" << std::endl);
 	const uint32_t avail_socks = _avail_socks;
-	for (uint32_t i = 0; i < avail_socks; i++) {
-		int ret, s;
-		Target cur_target;
-		while (true) {
-			cur_target = next_target();
-			if (cur_target.is_end()) {
-				return false;
-			}
-			ret = create_socket(s, cur_target);
-			if (ret == 0) {
-				break;
-			}
-			else {
-				if (errno == EINPROGRESS) {
+	try {
+		for (uint32_t i = 0; i < avail_socks; i++) {
+			int ret, s;
+			Target cur_target;
+			while (true) {
+				cur_target = next_target();
+				if (cur_target.is_end()) {
+					return false;
+				}
+				ret = create_socket(s, cur_target);
+				if (ret == 0) {
 					break;
 				}
-				socket_finished(s, errno);
-				_D(BOOST_LOG_TRIVIAL(trace) << s << " Error connecting to " << ipstr(cur_target.ipv4()) << ": " << errno << " " << strerror(errno) << std::endl);
+				else {
+					if (errno == EINPROGRESS) {
+						break;
+					}
+					socket_finished(s, errno);
+					_D(BOOST_LOG_TRIVIAL(trace) << s << " Error connecting to " << ipstr(cur_target.ipv4()) << ": " << errno << " " << strerror(errno) << std::endl);
+				}
 			}
+			_D(BOOST_LOG_TRIVIAL(trace) << "Connecting to " << ipstr(cur_target.ipv4()) << std::endl);
+			HostSM& hsm = host_sm(cur_target.ipv4());
+			init_host_sm(cur_target, hsm);
+
+			// Make sure it exists
+			Lvl4SM& p = lvl4_sm(s);
+			p.set_valid(true);
+			p.set_on_connect(_callback_lvl4_connected);
+			p.update_ts();
+
+			add_connecting_socket(s);
 		}
-		_D(BOOST_LOG_TRIVIAL(trace) << "Connecting to " << ipstr(cur_target.ipv4()) << std::endl);
-		HostSM& hsm = host_sm(cur_target.ipv4());
-		init_host_sm(cur_target, hsm);
-
-		// Make sure it exists
-		Lvl4SM& p = lvl4_sm(s);
-		p.set_valid(true);
-		p.set_on_connect(_callback_lvl4_connected);
-		p.update_ts();
-
-		add_connecting_socket(s);
+	}
+	catch (NextTargetWouldBlock const&) {
+		return true;
 	}
 	return true;
 }
@@ -351,15 +356,19 @@ void ns::AsyncEngine::do_async_scan()
 
 	epoll() = epoll_create(nsockets());
 	
-	while (true) {
-		// IP connect
-		const bool end_targets = !process_free_socks();
+	// First IP connect before anything else
+	process_free_socks();
 
+	while (true) {
 		// Events processing
 		const int nfds = process_events();
 
 		// Dirtys and timeouts
 		const size_t n_lvl4_sms_valid = process_dirty_and_timeouts();
+
+		// IP connect. It is done before the events processing because some of
+		// them might have add new targets into the original set.
+		const bool end_targets = !process_free_socks();
 
 		_D(BOOST_LOG_TRIVIAL(trace) << "nfds == " << nfds << " "
 		                            << "n_lvl4_sms_valid == " << n_lvl4_sms_valid << " "

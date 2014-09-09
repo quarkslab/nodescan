@@ -8,6 +8,7 @@ set(SRC_FILES
 	state_machine.cpp
 	target.cpp
 	target_set.cpp
+	target_file.cpp
 	timestamp.cpp
 	connected_target.cpp
 	protocols/ssl.cpp

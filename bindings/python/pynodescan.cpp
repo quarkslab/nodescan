@@ -33,6 +33,7 @@
 #include <ns/async_engine.h>
 #include <ns/action.h>
 #include <ns/target_set.h>
+#include <ns/target_file.h>
 #include <ns/lvl4_properties_storage.h>
 
 #include <ns/protocols/ssh.h>
@@ -258,6 +259,7 @@ uint64_t target_hash(ns::Target const& t)
 }
 
 typedef ns::RepeatableTargetSet<ns::SimpleTargetSet> RepeatableSimpleTargetSet;
+typedef ns::ReinjectableTargetSet<ns::TargetStdin> ReinjectableTargetStdin;
 
 BOOST_PYTHON_MODULE(pynodescan)
 {
@@ -286,6 +288,15 @@ BOOST_PYTHON_MODULE(pynodescan)
 	class_<RepeatableSimpleTargetSet, bases<ns::TargetSet>>("RepeatableSimpleTargetSet")
 		.def("add_target", &RepeatableSimpleTargetSet::add_target)
 		.def("remove_target", &RepeatableSimpleTargetSet::remove_target)
+		;
+
+	class_<ns::TargetStdin, bases<ns::TargetSet>>("TargetStdin",
+			init<leeloo::port>(args("def_port"), "Initialize a TargetStdin. def_port is the default port for read IP addresses"))
+		;
+
+	class_<ReinjectableTargetStdin, bases<ns::TargetSet>>("ReinjectableTargetStdin",
+			init<leeloo::port>(args("def_port"), "Initialize a ReinjectableTargetStdin. def_port is the default port for read IP addresses"))
+		.def("add_target", &ReinjectableTargetStdin::add_target)
 		;
 
 	class_<ns::AsyncEngine>("AsyncEngine",

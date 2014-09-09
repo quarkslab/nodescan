@@ -75,7 +75,7 @@ void ns::IPV4TargetSet::init()
 	_rand_port.init(_ports, leeloo::random_engine<uint32_t>(g_mt_rand_ports));
 }
 
-void ns::IPV4TargetSet::init_shrd(uint32_t shrd_idx, uint32_t shrd_count)
+void ns::IPV4TargetSet::init_shrd(uint32_t /*shrd_idx*/, uint32_t /*shrd_count*/)
 {
 }
 

@@ -32,18 +32,24 @@
 #define NS_TARGET_SET_H
 
 #include <ns/target.h>
+#include <ns/lvl4_buffer.h>
 
 #include <leeloo/ip_list_intervals.h>
+#include <leeloo/port.h>
 #include <leeloo/port_list_intervals.h>
 #include <leeloo/list_intervals_random.h>
 #include <leeloo/uni.h>
 
+#include <queue>
 #include <set>
 
 namespace ns {
 
 class Engine;
 class HostSM;
+
+struct NextTargetWouldBlock
+{ };
 
 class TargetSet
 {
@@ -140,11 +146,11 @@ public:
 		_it = _targets.begin();
 	}
 
-	virtual void init_shrd(uint32_t shrd_idx, uint32_t shrd_count) { }
+	virtual void init_shrd(uint32_t /*shrd_idx*/, uint32_t /*shrd_count*/) { }
 
-	virtual void save_state(std::ostream& os)
+	virtual void save_state(std::ostream&)
 	{ }
-	virtual void restore_state(std::istream& is)
+	virtual void restore_state(std::istream&)
 	{ }
 
 	virtual Target next_target()
@@ -157,7 +163,7 @@ public:
 		return ret;
 	}
 
-	virtual bool target_finished(Target const& target, HostSM& hsm) { return true; }
+	virtual bool target_finished(Target const&, HostSM&) { return true; }
 
 private:
 	target_storage_type _targets;
@@ -183,6 +189,42 @@ public:
 		}
 		return ret;
 	}
+};
+
+template <class T>
+class ReinjectableTargetSet: public T
+{
+public:
+	typedef T target_set_base_type;
+
+public:
+	using T::T;
+
+public:
+	void emplace_target(Target&& t)
+	{
+		_targets.emplace(std::move(t));
+	}
+
+	void add_target(Target const& t)
+	{
+		_targets.push(t);
+	}
+
+public:
+	Target next_target() override
+	{
+		// Added targets are done first
+		if (_targets.size() > 0) {
+			Target ret = std::move(_targets.front());
+			_targets.pop();
+			return ret;
+		}
+		return target_set_base_type::next_target();
+	}
+
+private:
+	std::queue<Target> _targets;
 };
 
 }
