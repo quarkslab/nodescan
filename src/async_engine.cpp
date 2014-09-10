@@ -166,9 +166,9 @@ void ns::AsyncEngine::reconnect(int s, Target const& target, Lvl4SM& lvl4sm)
 int ns::AsyncEngine::create_socket(int& s, Target const& target)
 {
 	assert(_avail_socks > 0);
-	struct in_addr addr_;
+	/*struct in_addr addr_;
 	addr_.s_addr = htonl(target.ipv4());
-	std::cerr << "Connecting to " << inet_ntoa(addr_) << "..." << std::endl;
+	std::cerr << "Connecting to " << inet_ntoa(addr_) << "..." << std::endl;*/
 
 	leeloo::port port = target.port();
 	s = new_socket(port.socket_type(), port.socket_proto());
