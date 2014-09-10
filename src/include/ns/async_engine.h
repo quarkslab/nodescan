@@ -73,6 +73,12 @@ public:
 
 	void set_lvl4_finish_callback(Lvl4Finish const& f) { _callback_finish = f; }
 
+	void set_status_display_callback(StatusDisplay const& f, uint32_t timeout)
+	{
+		_callback_status = f;
+		_timeout_status_display = timeout;
+	}
+
 public:
 	uint32_t timeout() const { return _timeout; }
 	uint32_t nsockets() const { return _nsockets; }
@@ -149,6 +155,8 @@ private:
 
 	void socket_finished(int s, int err);
 
+	bool should_call_status_display();
+
 
 private:
 	hosts_sms_type _hosts_sms;
@@ -162,8 +170,17 @@ private:
 	uint32_t _nsockets;
 	uint32_t _timeout;
 
+	// Status
+	size_t _nlaunched;
+	size_t _ndone;
+
 	// Errors
 	Lvl4Finish _callback_finish;
+
+	// Status display
+	StatusDisplay _callback_status;
+	uint32_t _timeout_status_display; // in seconds
+	time_t _last_time_status_display;
 };
 
 }

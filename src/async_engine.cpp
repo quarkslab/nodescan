@@ -30,6 +30,8 @@
 
 #define _BSD_SOURCE
 
+#include <arpa/inet.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -40,7 +42,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <errno.h>
 
 #include <iostream>
 
@@ -69,7 +70,8 @@ static int new_socket(int type, int proto)
 ns::AsyncEngine::AsyncEngine(TargetSet& targets, uint32_t nsockets, uint32_t timeout):
 	Engine(targets),
 	_nsockets(nsockets),
-	_timeout(timeout)
+	_timeout(timeout),
+	_timeout_status_display(0)
 {
 	init_sockets();
 }
@@ -108,6 +110,7 @@ void ns::AsyncEngine::free_socket(int s)
 
 void ns::AsyncEngine::socket_finished(int s, int err)
 {
+	_ndone++;
 	Target t = target_from_socket(s);
 	callback_finish(t, err);
 	if (target_finished(t, host_sm(t.ipv4()))) {
@@ -163,6 +166,9 @@ void ns::AsyncEngine::reconnect(int s, Target const& target, Lvl4SM& lvl4sm)
 int ns::AsyncEngine::create_socket(int& s, Target const& target)
 {
 	assert(_avail_socks > 0);
+	struct in_addr addr_;
+	addr_.s_addr = htonl(target.ipv4());
+	std::cerr << "Connecting to " << inet_ntoa(addr_) << "..." << std::endl;
 
 	leeloo::port port = target.port();
 	s = new_socket(port.socket_type(), port.socket_proto());
@@ -255,6 +261,7 @@ bool ns::AsyncEngine::process_free_socks()
 				if (cur_target.is_end()) {
 					return false;
 				}
+				_nlaunched++;
 				ret = create_socket(s, cur_target);
 				if (ret == 0) {
 					break;
@@ -350,23 +357,43 @@ size_t ns::AsyncEngine::process_dirty_and_timeouts()
 	return n_lvl4_sms_valid;
 }
 
+bool ns::AsyncEngine::should_call_status_display()
+{
+	if (!_callback_status || _timeout_status_display == 0) {
+		return false;
+	}
+
+	const time_t now = timestamp();
+	if (now-_last_time_status_display >= _timeout_status_display) {
+		_last_time_status_display = now;
+		return true;
+	}
+
+	return false;
+}
+
 void ns::AsyncEngine::do_async_scan()
 {
 	_D(BOOST_LOG_NAMED_SCOPE("AsyncEngine::do_async_scan"));
 
 	epoll() = epoll_create(nsockets());
 	
-	// First IP connect before anything else
+	_nlaunched = 0;
+	_ndone = 0;
+
+	_last_time_status_display = 0;
+
 	process_free_socks();
 
 	while (true) {
+
 		// Events processing
 		const int nfds = process_events();
 
-		// Dirtys and timeouts
+		// Dirties and timeouts
 		const size_t n_lvl4_sms_valid = process_dirty_and_timeouts();
 
-		// IP connect. It is done before the events processing because some of
+		// IP connect. It is done after the events processing because some of
 		// them might have add new targets into the original set.
 		const bool end_targets = !process_free_socks();
 
@@ -376,6 +403,10 @@ void ns::AsyncEngine::do_async_scan()
 		// Check for the end
 		if (nfds == 0 && n_lvl4_sms_valid == 0 && end_targets) {
 			break;
+		}
+
+		if (should_call_status_display()) {
+			_callback_status(_nlaunched, _ndone);
 		}
 
 		if (should_save_state()) {

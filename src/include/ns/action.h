@@ -46,6 +46,7 @@ typedef std::function<bool(ConnectedTarget const& target, Lvl4SM& lvl4sm, HostSM
 typedef std::function<bool(ConnectedTarget const& target, Lvl4SM& lvl4sm, HostSM& hsm)> Lvl4Action;
 
 typedef std::function<void(Target const& target, int error)> Lvl4Finish;
+typedef std::function<void(uint32_t nlaunched, uint32_t ndone)> StatusDisplay;
 
 }
 

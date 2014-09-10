@@ -115,6 +115,16 @@ static void async_engine_set_lvl4_finish_callback(ns::AsyncEngine& e, boost::pyt
 		});
 }
 
+static void async_engine_set_status_display_callback(ns::AsyncEngine& e, boost::python::object const& f, uint32_t timeout)
+{
+	e.set_status_display_callback(
+		[f](uint32_t nlaunched, uint32_t ndone)
+		{ 
+			f(nlaunched, ndone);
+		},
+		timeout);
+}
+
 void lvl4sm_set_char_data_trigger(ns::Lvl4SM& lvl4sm, std::string const& c, boost::python::object const& f)
 {
 	if (c.size() != 1) {
@@ -305,6 +315,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("launch_shrd", &ns::AsyncEngine::launch_shrd)
 		.def("set_lvl4_connected_callback", &async_engine_set_lvl4_connected_callback)
 		.def("set_lvl4_finish_callback", &async_engine_set_lvl4_finish_callback)
+		.def("set_status_display_callback", async_engine_set_status_display_callback)
 		.def("save_state", &ns::AsyncEngine::save_state)
 		.def("restore_state", &ns::AsyncEngine::restore_state)
 		.def("auto_save_state", &ns::AsyncEngine::auto_save_state)
