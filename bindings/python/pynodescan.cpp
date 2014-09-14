@@ -52,7 +52,7 @@ static object object_from_ro_mem(const unsigned char* buf, size_t const n)
 #else
 #if PY_VERSION_HEX < 0x03030000
 	Py_buffer buffer;
-	int res = PyBuffer_FillInfo(&buffer, 0, buf, n, true, PyBUF_CONTIG_RO);
+	int res = PyBuffer_FillInfo(&buffer, 0, (void*) buf, n, true, PyBUF_CONTIG_RO);
 	if (res == -1) {
 		PyErr_Print();
 		return boost::python::object();
