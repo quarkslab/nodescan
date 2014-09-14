@@ -79,8 +79,15 @@ public:
 		_timeout_status_display = timeout;
 	}
 
+	void set_watch_timeout(WatchTimeout const& f, uint32_t timeout)
+	{
+		_watch_timeout = timeout;
+		_watch_timeout_cb = f;
+	}
+
 public:
 	uint32_t timeout() const { return _timeout; }
+	uint32_t watch_timeout() const { return _watch_timeout; }
 	uint32_t nsockets() const { return _nsockets; }
 
 private:
@@ -146,10 +153,10 @@ private:
 		return _lvl4_sms[s];
 	}
 
-	void callback_finish(Target const& t, int error)
+	void callback_finish(Target const& t, const unsigned char* buf_rem, size_t buf_size, int error)
 	{
 		if (_callback_finish) {
-			_callback_finish(t, error);
+			_callback_finish(t, buf_rem, buf_size, error);
 		}
 	}
 
@@ -157,6 +164,7 @@ private:
 
 	bool should_call_status_display();
 
+	bool has_watch_timedout(time_t ts, int s, Lvl4SM& lvl4sm) const;
 
 private:
 	hosts_sms_type _hosts_sms;
@@ -169,6 +177,8 @@ private:
 	// Configuration
 	uint32_t _nsockets;
 	uint32_t _timeout;
+	uint32_t _watch_timeout;
+	WatchTimeout _watch_timeout_cb;
 
 	// Status
 	size_t _nlaunched;

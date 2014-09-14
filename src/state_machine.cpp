@@ -33,7 +33,8 @@
 
 ns::StateMachine::StateMachine():
 	_valid(false),
-	_ts(0)
+	_ts(0),
+	_watch_ts(timestamp())
 {
 }
 

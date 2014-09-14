@@ -112,7 +112,8 @@ void ns::AsyncEngine::socket_finished(int s, int err)
 {
 	_ndone++;
 	Target t = target_from_socket(s);
-	callback_finish(t, err);
+	Lvl4Buffer const& buf = lvl4_sm(s).buffer();
+	callback_finish(t, buf.begin(), buf.size(), err);
 	if (target_finished(t, host_sm(t.ipv4()))) {
 		del_host_sm(t);
 	}
@@ -314,6 +315,21 @@ int ns::AsyncEngine::process_events()
 	return nfds;
 }
 
+bool ns::AsyncEngine::has_watch_timedout(time_t ts, int s, Lvl4SM& lvl4sm) const
+{
+	if (!_watch_timeout_cb || (_watch_timeout == 0)) {
+		return false;
+	}
+
+	if ((ts-lvl4sm.watch_ts()) >= watch_timeout()) {
+		if (!_watch_timeout_cb(ConnectedTarget(s, Target::from_socket(s)))) {
+			return true;
+		}
+		lvl4sm.update_watch_ts(ts);
+	}
+	return false;
+}
+
 size_t ns::AsyncEngine::process_dirty_and_timeouts()
 {
 	_D(BOOST_LOG_TRIVIAL(trace) << "begin timeouts" << std::endl);
@@ -329,7 +345,7 @@ size_t ns::AsyncEngine::process_dirty_and_timeouts()
 				const int s = it->first;
 				to_process.push_back(std::make_pair(s, &p));
 			}
-			if ((ts-p.ts()) >= timeout()) {
+			if (((ts-p.ts()) >= timeout()) || has_watch_timedout(ts, it->first, p)) {
 				const int s = it->first;
 				timeouted.push_back(s);
 			}

@@ -45,7 +45,7 @@ namespace nsp = ns::protocols;
 
 using namespace boost::python;
 
-static object object_from_ro_mem(unsigned char* buf, size_t const n)
+static object object_from_ro_mem(const unsigned char* buf, size_t const n)
 {
 #if PY_VERSION_HEX < 0x03000000
 	return boost::python::object(boost::python::handle<>(PyBuffer_FromReadWriteMemory((void*) buf, n)));
@@ -109,9 +109,9 @@ static void async_engine_set_lvl4_connected_callback(ns::AsyncEngine& e, boost::
 static void async_engine_set_lvl4_finish_callback(ns::AsyncEngine& e, boost::python::object const& f)
 {
 	e.set_lvl4_finish_callback(
-		[f](ns::Target const& target, int code) -> bool
+		[f](ns::Target const& target, const unsigned char* buf, size_t size, int code) -> bool
 		{ 
-			return extract<bool>(f(target, code));
+			return extract<bool>(f(target, object_from_ro_mem(buf, size), code));
 		});
 }
 
@@ -121,6 +121,16 @@ static void async_engine_set_status_display_callback(ns::AsyncEngine& e, boost::
 		[f](uint32_t nlaunched, uint32_t ndone)
 		{ 
 			f(nlaunched, ndone);
+		},
+		timeout);
+}
+
+static void async_engine_set_watch_timeout(ns::AsyncEngine& e, boost::python::object const& f, uint32_t const timeout)
+{
+	e.set_watch_timeout(
+		[f](ns::ConnectedTarget const& t) -> bool
+		{ 
+			return extract<bool>(f(t));
 		},
 		timeout);
 }
@@ -316,6 +326,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("set_lvl4_connected_callback", &async_engine_set_lvl4_connected_callback)
 		.def("set_lvl4_finish_callback", &async_engine_set_lvl4_finish_callback)
 		.def("set_status_display_callback", async_engine_set_status_display_callback)
+		.def("set_watch_timeout", async_engine_set_watch_timeout)
 		.def("save_state", &ns::AsyncEngine::save_state)
 		.def("restore_state", &ns::AsyncEngine::restore_state)
 		.def("auto_save_state", &ns::AsyncEngine::auto_save_state)

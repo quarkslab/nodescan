@@ -86,6 +86,8 @@ public:
 		return false;
 	}
 
+	Lvl4Buffer const& buffer() const { return _buf; }
+
 private:
 	bool _reconnect;
 	bool _reprocess;

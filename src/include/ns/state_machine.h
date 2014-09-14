@@ -44,12 +44,16 @@ public:
 	void update_ts();
 	time_t ts() const { return _ts; }
 
+	void update_watch_ts(time_t const ts) { _watch_ts = ts; }
+	time_t watch_ts() const { return _watch_ts; }
+
 	inline void set_valid(bool v) { _valid = v; }
 	inline bool valid() const { return _valid; }
 
 private:
 	bool _valid;
 	time_t _ts;
+	time_t _watch_ts;
 };
 
 }

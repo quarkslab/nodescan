@@ -45,8 +45,9 @@ typedef std::function<void(HostSM& sm)> HostAction;
 typedef std::function<bool(ConnectedTarget const& target, Lvl4SM& lvl4sm, HostSM& hsm, unsigned char*, uint32_t size)> Lvl4DataAction;
 typedef std::function<bool(ConnectedTarget const& target, Lvl4SM& lvl4sm, HostSM& hsm)> Lvl4Action;
 
-typedef std::function<void(Target const& target, int error)> Lvl4Finish;
+typedef std::function<void(Target const& target, const unsigned char* buf_rem, uint32_t buf_size, int error)> Lvl4Finish;
 typedef std::function<void(uint32_t nlaunched, uint32_t ndone)> StatusDisplay;
+typedef std::function<bool(ConnectedTarget const& t)> WatchTimeout;
 
 }
 

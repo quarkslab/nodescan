@@ -39,7 +39,7 @@ int main()
 		}
 	);
 	engine.set_lvl4_finish_callback(
-		[](ns::Target const& target, int err)
+		[](ns::Target const& target, const unsigned char*, size_t, int err)
 		{
 			std::cout << "finish for port " << target.port_value() << ": " << strerror(err) << std::endl;
 		});
