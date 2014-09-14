@@ -88,6 +88,12 @@ public:
 
 	Lvl4Buffer const& buffer() const { return _buf; }
 
+	void remove_data_trigger()
+	{
+		set_trigger<DataTrigger>();
+		_reprocess = false;
+	}
+
 private:
 	bool _reconnect;
 	bool _reprocess;

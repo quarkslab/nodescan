@@ -361,6 +361,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("set_char_data_trigger", lvl4sm_set_char_data_trigger)
 		.def("set_size_data_trigger", lvl4sm_set_size_data_trigger)
 		.def("set_data_trigger", lvl4sm_set_python_data_trigger)
+		.def("remove_data_trigger", &ns::Lvl4SM::remove_data_trigger)
 		;
 
 	class_<ns::HostSM, boost::noncopyable>("HostSM")
