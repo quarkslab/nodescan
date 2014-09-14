@@ -50,6 +50,7 @@
 #include <ns/ipstr.h>
 #include <ns/target.h>
 #include <ns/log.h>
+#include <ns/errors.h>
 
 #define MAX_EVENTS 1024
 
@@ -192,6 +193,8 @@ void ns::AsyncEngine::process_connected_ready(int s, Target const& target, Lvl4S
 	if (navail == 0) {
 		_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " remote host deconnected" << std::endl);
 		if (lvl4sm.reconnect()) {
+			Lvl4Buffer const& buf = lvl4_sm(s).buffer();
+			callback_finish(target, buf.begin(), buf.size(), (int) errors::WILL_RECONNECT);
 			reconnect(s, target, lvl4sm);
 			return;
 		}
@@ -367,7 +370,7 @@ size_t ns::AsyncEngine::process_dirty_and_timeouts()
 	}
 
 	for (int s: timeouted) {
-		socket_finished(s, ETIMEDOUT);
+		socket_finished(s, (int) errors::NS_TIMEOUT);
 	}
 
 	return n_lvl4_sms_valid;

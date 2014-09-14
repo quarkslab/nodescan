@@ -35,6 +35,7 @@
 #include <ns/target_set.h>
 #include <ns/target_file.h>
 #include <ns/lvl4_properties_storage.h>
+#include <ns/errors.h>
 
 #include <ns/protocols/ssh.h>
 #include <ns/protocols/ssl.h>
@@ -377,6 +378,11 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("__getitem__", &Lvl4PythonPropertiesStorage::properties_of, return_value_policy<return_by_value>())
 		.def("__getitem__", &python_properties_storage_get, return_value_policy<return_by_value>())
 		.def("__setitem__", &python_properties_storage_set)
+		;
+
+	enum_<ns::errors>("errors")
+		.value("NS_TIMEOUT", ns::errors::NS_TIMEOUT)
+		.value("WILL_RECONNECT", ns::errors::WILL_RECONNECT)
 		;
 
 	scope protocols = class_<PythonProtocols>("protocols");
