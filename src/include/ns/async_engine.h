@@ -126,7 +126,7 @@ private:
 	void process_connecting_ready(int s, Lvl4SM& lvl4sm);
 	void process_connected_ready(int s, Target const& target, Lvl4SM& lvl4sm);
 
-	void reconnect(int s, Target const& target, Lvl4SM& lvl4sm);
+	void reconnect(int s, Target const& target, Lvl4SM const& lvl4sm);
 	int create_socket(int& s, Target const& target);
 
 	Target const& target_from_socket(int s) const

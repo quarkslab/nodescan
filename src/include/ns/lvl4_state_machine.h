@@ -56,7 +56,9 @@ public:
 	void set_reconnect(bool v) { _reconnect = v; }
 	bool reconnect() const { return _reconnect; }
 
+	Lvl4Action const& get_on_connect() const { return _func_connect; }
 	void set_on_connect(Lvl4Action const f) { _func_connect = f; }
+
 	inline bool on_connect(int s, Target const& target, HostSM& hsm)
 	{
 		if (!_func_connect) {
