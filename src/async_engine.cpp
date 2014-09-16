@@ -198,6 +198,8 @@ void ns::AsyncEngine::process_connected_ready(int s, Target const& target, Lvl4S
 		if (lvl4sm.reconnect()) {
 			Lvl4Buffer const& buf = lvl4sm.buffer();
 			callback_finish(target, buf.begin(), buf.size(), (int) errors::WILL_RECONNECT);
+			// Purge buffer here!
+			buf.free();
 			reconnect(s, target, lvl4sm);
 			return;
 		}
