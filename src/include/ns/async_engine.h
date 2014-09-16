@@ -153,10 +153,10 @@ private:
 		return _lvl4_sms[s];
 	}
 
-	void callback_finish(Target const& t, const unsigned char* buf_rem, size_t buf_size, int error)
+	void callback_finish(Target const& t, Lvl4Buffer const& buf, int error)
 	{
 		if (_callback_finish) {
-			_callback_finish(t, buf_rem, buf_size, error);
+			_callback_finish(t, buf.begin(), buf.size(), error);
 		}
 	}
 

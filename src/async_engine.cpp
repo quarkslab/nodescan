@@ -113,8 +113,10 @@ void ns::AsyncEngine::socket_finished(int s, int err)
 {
 	_ndone++;
 	Target t = target_from_socket(s);
-	Lvl4Buffer const& buf = lvl4_sm(s).buffer();
-	callback_finish(t, buf.begin(), buf.size(), err);
+	Lvl4SM& lvl4sm = lvl4_sm(s);
+	Lvl4Buffer const& buf = lvl4sm.buffer();
+	callback_finish(t, buf, err);
+	lvl4sm.free_buffer();
 	if (target_finished(t, host_sm(t.ipv4()))) {
 		del_host_sm(t);
 	}
@@ -197,9 +199,8 @@ void ns::AsyncEngine::process_connected_ready(int s, Target const& target, Lvl4S
 		_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " remote host deconnected" << std::endl);
 		if (lvl4sm.reconnect()) {
 			Lvl4Buffer const& buf = lvl4sm.buffer();
-			callback_finish(target, buf.begin(), buf.size(), (int) errors::WILL_RECONNECT);
-			// Purge buffer here!
-			buf.free();
+			callback_finish(target, buf, (int) errors::WILL_RECONNECT);
+			lvl4sm.free_buffer();
 			reconnect(s, target, lvl4sm);
 			return;
 		}
