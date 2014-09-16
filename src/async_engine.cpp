@@ -186,6 +186,7 @@ int ns::AsyncEngine::create_socket(int& s, Target const& target)
 	Lvl4SM& lvl4sm = new_lvl4_sm(s);
 	lvl4sm.set_valid(true);
 	lvl4sm.set_on_connect(_callback_lvl4_connected);
+	lvl4sm.update_ts();
 	_sockets_targets.insert(std::make_pair(s, target));
 	return ret;
 }
@@ -287,12 +288,6 @@ bool ns::AsyncEngine::process_free_socks()
 			_D(BOOST_LOG_TRIVIAL(trace) << "Connecting to " << ipstr(cur_target.ipv4()) << std::endl);
 			HostSM& hsm = host_sm(cur_target.ipv4());
 			init_host_sm(cur_target, hsm);
-
-			// Make sure it exists
-			Lvl4SM& p = lvl4_sm(s);
-			p.set_valid(true);
-			p.set_on_connect(_callback_lvl4_connected);
-			p.update_ts();
 
 			add_connecting_socket(s);
 		}
