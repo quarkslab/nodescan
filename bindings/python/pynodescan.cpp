@@ -46,8 +46,12 @@ namespace nsp = ns::protocols;
 
 using namespace boost::python;
 
-static object object_from_ro_mem(const unsigned char* buf, size_t const n)
+static object object_from_ro_mem(const unsigned char* buf, size_t n)
 {
+	if (buf == nullptr) {
+		buf = (const unsigned char*) "";
+		n = 0;
+	}
 #if PY_VERSION_HEX < 0x03000000
 	return boost::python::object(boost::python::handle<>(PyBuffer_FromReadWriteMemory((void*) buf, n)));
 #else
