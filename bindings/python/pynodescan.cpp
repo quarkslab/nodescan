@@ -48,9 +48,6 @@ using namespace boost::python;
 
 static object object_from_ro_mem(const unsigned char* buf, size_t const n)
 {
-	if (buf == nullptr || n == 0) {
-		return boost::python::str("");
-	}
 #if PY_VERSION_HEX < 0x03000000
 	return boost::python::object(boost::python::handle<>(PyBuffer_FromReadWriteMemory((void*) buf, n)));
 #else
