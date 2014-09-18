@@ -136,6 +136,15 @@ static void async_engine_set_watch_timeout(ns::AsyncEngine& e, boost::python::ob
 		timeout);
 }
 
+static void async_engine_set_timeout_of_target(ns::AsyncEngine& e, boost::python::object const& f)
+{
+	e.set_timeout_of_target(
+		[f](ns::Target const& t) -> uint32_t
+		{ 
+			return extract<uint32_t>(f(t));
+		});
+}
+
 void lvl4sm_set_char_data_trigger(ns::Lvl4SM& lvl4sm, std::string const& c, boost::python::object const& f)
 {
 	if (c.size() != 1) {
@@ -328,6 +337,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("set_lvl4_finish_callback", &async_engine_set_lvl4_finish_callback)
 		.def("set_status_display_callback", async_engine_set_status_display_callback)
 		.def("set_watch_timeout", async_engine_set_watch_timeout)
+		.def("set_timeout_of_target", async_engine_set_timeout_of_target)
 		.def("save_state", &ns::AsyncEngine::save_state)
 		.def("restore_state", &ns::AsyncEngine::restore_state)
 		.def("auto_save_state", &ns::AsyncEngine::auto_save_state)

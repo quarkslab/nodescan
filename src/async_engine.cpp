@@ -345,11 +345,12 @@ size_t ns::AsyncEngine::process_dirty_and_timeouts()
 	for (it = _lvl4_sms.begin(); it != _lvl4_sms.end(); it++) {
 		Lvl4SM& p = it->second;
 		if (p.valid()) {
+			const int s = it->first;
 			if (p.should_process_buffer()) {
-				const int s = it->first;
 				to_process.push_back(std::make_pair(s, &p));
 			}
-			if (((ts-p.ts()) >= timeout()) || has_watch_timedout(ts, it->first, p)) {
+			const uint32_t timeout_target = timeout_of_target(Target::from_socket(s));
+			if (((ts-p.ts()) >= timeout_target) || has_watch_timedout(ts, it->first, p)) {
 				const int s = it->first;
 				timeouted.push_back(s);
 			}

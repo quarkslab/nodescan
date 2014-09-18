@@ -85,6 +85,11 @@ public:
 		_watch_timeout_cb = f;
 	}
 
+	void set_timeout_of_target(TimeoutTarget const& f)
+	{
+		_callback_timeout_target = f;
+	}
+
 public:
 	uint32_t timeout() const { return _timeout; }
 	uint32_t watch_timeout() const { return _watch_timeout; }
@@ -166,6 +171,14 @@ private:
 
 	bool has_watch_timedout(time_t ts, int s, Lvl4SM& lvl4sm) const;
 
+	inline uint32_t timeout_of_target(Target const& t) const
+	{
+		if (_callback_timeout_target) {
+			return _callback_timeout_target(t);
+		}
+		return _timeout;
+	}
+
 private:
 	hosts_sms_type _hosts_sms;
 	lvl4_sms_type _lvl4_sms;
@@ -186,6 +199,9 @@ private:
 
 	// Errors
 	Lvl4Finish _callback_finish;
+
+	// Timeout of target
+	TimeoutTarget _callback_timeout_target;
 
 	// Status display
 	StatusDisplay _callback_status;
