@@ -126,7 +126,10 @@ class SimpleTargetSet: public TargetSet
 public:
 	void add_target(Target const& target)
 	{
-		_targets.insert(target);
+		target_storage_type::iterator it = _targets.insert(target).first;
+		if (_it == _targets.end()) {
+			_it = it;
+		}
 	}
 	
 	void remove_target(Target const& target)
@@ -158,7 +161,7 @@ public:
 		if (_it == _targets.end()) {
 			return Target::end();
 		}
-		Target ret = *_it;
+		Target const& ret = *_it;
 		++_it;
 		return ret;
 	}

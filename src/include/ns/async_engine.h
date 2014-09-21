@@ -90,6 +90,8 @@ public:
 		_callback_timeout_target = f;
 	}
 
+	void ensure_available_sockets(const size_t n);
+
 public:
 	uint32_t timeout() const { return _timeout; }
 	uint32_t watch_timeout() const { return _watch_timeout; }

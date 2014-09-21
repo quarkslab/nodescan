@@ -345,6 +345,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("save_state", &ns::AsyncEngine::save_state)
 		.def("restore_state", &ns::AsyncEngine::restore_state)
 		.def("auto_save_state", &ns::AsyncEngine::auto_save_state)
+		.def("ensure_available_sockets", &ns::AsyncEngine::ensure_available_sockets)
 		;
 
 	class_<ns::Target>("Target",

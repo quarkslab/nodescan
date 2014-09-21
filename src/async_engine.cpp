@@ -440,3 +440,10 @@ ns::Lvl4SM& ns::AsyncEngine::lvl4_sm(epoll_event const& ev)
 {
 	return lvl4_sm(ev.data.fd);
 }
+
+void ns::AsyncEngine::ensure_available_sockets(const size_t n)
+{
+	if (_avail_socks < n) {
+		_avail_socks += (n-_avail_socks);
+	}
+}
