@@ -188,6 +188,10 @@ int ns::AsyncEngine::create_socket(int& s, Target const& target)
 	lvl4sm.set_on_connect(_callback_lvl4_connected);
 	lvl4sm.update_ts();
 	_sockets_targets.insert(std::make_pair(s, target));
+
+	HostSM& hsm = host_sm(target.ipv4());
+	init_host_sm(target, hsm);
+
 	return ret;
 }
 
@@ -286,8 +290,6 @@ bool ns::AsyncEngine::process_free_socks()
 				}
 			}
 			_D(BOOST_LOG_TRIVIAL(trace) << "Connecting to " << ipstr(cur_target.ipv4()) << std::endl);
-			HostSM& hsm = host_sm(cur_target.ipv4());
-			init_host_sm(cur_target, hsm);
 
 			add_connecting_socket(s);
 		}
