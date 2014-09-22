@@ -189,9 +189,6 @@ int ns::AsyncEngine::create_socket(int& s, Target const& target)
 	lvl4sm.update_ts();
 	_sockets_targets.insert(std::make_pair(s, target));
 
-	HostSM& hsm = host_sm(target.ipv4());
-	init_host_sm(target, hsm);
-
 	return ret;
 }
 
@@ -278,6 +275,10 @@ bool ns::AsyncEngine::process_free_socks()
 				}
 				_nlaunched++;
 				ret = create_socket(s, cur_target);
+
+				HostSM& hsm = host_sm(cur_target.ipv4());
+				init_host_sm(cur_target, hsm);
+
 				if (ret == 0) {
 					break;
 				}
