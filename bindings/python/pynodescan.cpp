@@ -41,6 +41,10 @@
 #include <ns/protocols/ssl.h>
 #include <ns/protocols/sip.h>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 
 namespace nsp = ns::protocols;
 
@@ -295,6 +299,15 @@ uint64_t target_hash(ns::Target const& t)
 typedef ns::RepeatableTargetSet<ns::SimpleTargetSet> RepeatableSimpleTargetSet;
 typedef ns::ReinjectableTargetSet<ns::TargetStdin> ReinjectableTargetStdin;
 
+std::string target_repr(ns::Target const& t)
+{
+	std::stringstream ss;
+	struct in_addr addr;
+	addr.s_addr = htonl(t.ipv4());
+	ss << "<" << inet_ntoa(addr) <<":" << t.port_value() << "/" << leeloo::port::protocol_name(t.port_protocol()) << ">";
+	return ss.str();
+}
+
 BOOST_PYTHON_MODULE(pynodescan)
 {
 	class_<NSTargetSetWrap, boost::noncopyable>("TargetSet")
@@ -357,6 +370,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("is_end", &ns::Target::is_end)
 		.def("__hash__", &target_hash)
 		.def("__eq__", &ns::Target::operator==)
+		.def("__repr__", target_repr);
 		;
 
 	class_<ns::ConnectedTarget>("ConnectedTarget",
