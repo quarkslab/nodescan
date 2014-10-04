@@ -112,11 +112,14 @@ void ns::AsyncEngine::free_socket(int s)
 void ns::AsyncEngine::socket_finished(int s, int err)
 {
 	_ndone++;
+	assert(_nlaunched >= _ndone);
+	assert((_nlaunched-_ndone) <= _nsockets);
 	Target t = target_from_socket(s);
 	Lvl4SM& lvl4sm = lvl4_sm(s);
 	Lvl4Buffer const& buf = lvl4sm.buffer();
 	callback_finish(t, buf, err);
 	lvl4sm.free_buffer();
+	assert(_hosts_sms.find(t.ipv4()) != _hosts_sms.end());
 	if (target_finished(t, host_sm(t.ipv4()))) {
 		del_host_sm(t);
 	}
@@ -159,9 +162,12 @@ void ns::AsyncEngine::reconnect(int s, Target const& target, Lvl4SM const& lvl4s
 	_D(BOOST_LOG_TRIVIAL(trace) << "reconnect" << std::endl);
 	Lvl4Action cur_action = lvl4sm.get_on_connect();
 
-	remove_connected_socket(s);
-	close(s);
-	_avail_socks++;
+//	remove_connected_socket(s);
+//	close(s);
+
+	Lvl4Buffer const& buf = lvl4sm.buffer();
+	callback_finish(target, buf, (int) errors::WILL_RECONNECT);
+	free_socket(s);
 
 	create_socket(s, target);
 	lvl4_sm(s).set_on_connect(cur_action);
@@ -200,9 +206,6 @@ void ns::AsyncEngine::process_connected_ready(int s, Target const& target, Lvl4S
 	if (navail == 0) {
 		_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " remote host deconnected" << std::endl);
 		if (lvl4sm.reconnect()) {
-			Lvl4Buffer const& buf = lvl4sm.buffer();
-			callback_finish(target, buf, (int) errors::WILL_RECONNECT);
-			lvl4sm.free_buffer();
 			reconnect(s, target, lvl4sm);
 			return;
 		}
@@ -274,6 +277,8 @@ bool ns::AsyncEngine::process_free_socks()
 					return false;
 				}
 				_nlaunched++;
+				assert(_nlaunched >= _ndone);
+				assert((_nlaunched-_ndone) <= _nsockets);
 				ret = create_socket(s, cur_target);
 
 				HostSM& hsm = host_sm(cur_target.ipv4());
