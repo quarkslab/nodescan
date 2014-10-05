@@ -30,10 +30,21 @@
 
 #include <ns/target.h>
 #include <leeloo/port.h>
+#include <leeloo/ips_parser.h>
 
 #include <string.h>
 
 #include <sys/socket.h>
+
+ns::Target::Target(const char* ipv4, leeloo::port port_):
+	_port(port_)
+{
+	bool valid;
+	_ipv4 = leeloo::ips_parser::ipv4toi(ipv4, valid);
+	if (!valid) {
+		*this = end();
+	}
+}
 
 ns::Target ns::Target::end()
 {

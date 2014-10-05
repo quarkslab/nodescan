@@ -47,6 +47,8 @@ public:
 		_port(port_)
 	{ }
 
+	Target(const char* ipv4, leeloo::port port_);
+
 public:
 	inline uint32_t ipv4() const { return _ipv4; }
 	inline leeloo::port port() const { return _port; }

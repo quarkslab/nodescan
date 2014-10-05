@@ -364,6 +364,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 
 	class_<ns::Target>("Target",
 			init<uint32_t, leeloo::port>(args("ipv4", "port"), "Initialize a target object"))
+		.def(init<const char*, leeloo::port>(args("ipv4", "port"), "Initialize a target object"))
 		.def("ipv4", &ns::Target::ipv4)
 		.def("port", &ns::Target::port)
 		.def("port_value", &ns::Target::port_value)
