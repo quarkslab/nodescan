@@ -92,6 +92,8 @@ public:
 
 	void ensure_available_sockets(const size_t n);
 
+	void set_buffer_size_limit(uint32_t limit) { _buf_limit = limit; }
+
 public:
 	uint32_t timeout() const { return _timeout; }
 	uint32_t watch_timeout() const { return _watch_timeout; }
@@ -209,6 +211,9 @@ private:
 	StatusDisplay _callback_status;
 	uint32_t _timeout_status_display; // in seconds
 	time_t _last_time_status_display;
+
+	// Limits
+	uint32_t _buf_limit;
 };
 
 }

@@ -5,7 +5,8 @@ namespace ns {
 
 enum class errors : int {
 	NS_TIMEOUT = 1000,
-	WILL_RECONNECT
+	WILL_RECONNECT,
+	BUFFER_LIMIT_REACHED
 };
 
 }

@@ -359,6 +359,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("restore_state", &ns::AsyncEngine::restore_state)
 		.def("auto_save_state", &ns::AsyncEngine::auto_save_state)
 		.def("ensure_available_sockets", &ns::AsyncEngine::ensure_available_sockets)
+		.def("set_buffer_size_limit", &ns::AsyncEngine::set_buffer_size_limit)
 		;
 
 	class_<ns::Target>("Target",
@@ -413,6 +414,7 @@ BOOST_PYTHON_MODULE(pynodescan)
 	enum_<ns::errors>("errors")
 		.value("NS_TIMEOUT", ns::errors::NS_TIMEOUT)
 		.value("WILL_RECONNECT", ns::errors::WILL_RECONNECT)
+		.value("BUFFER_LIMIT_REACHED", ns::errors::BUFFER_LIMIT_REACHED)
 		;
 
 	scope protocols = class_<PythonProtocols>("protocols");

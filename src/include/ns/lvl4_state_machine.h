@@ -52,6 +52,13 @@ public:
 public:
 	bool process_lvl4_data(int s, uint32_t navail, Target const& target, HostSM& hsm);
 	bool process_buffer(int s, Target const& target, HostSM& hsm);
+	bool is_buffer_full(uint32_t navail, uint32_t buf_limit) const
+	{
+		if (buf_limit == 0) {
+			return false;
+		}
+		return _buf.size() + navail >= buf_limit;
+	}
 
 	void set_reconnect(bool v) { _reconnect = v; }
 	bool reconnect() const { return _reconnect; }

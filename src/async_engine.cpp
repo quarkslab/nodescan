@@ -72,7 +72,8 @@ ns::AsyncEngine::AsyncEngine(TargetSet& targets, uint32_t nsockets, uint32_t tim
 	Engine(targets),
 	_nsockets(nsockets),
 	_timeout(timeout),
-	_timeout_status_display(0)
+	_timeout_status_display(0),
+	_buf_limit(0)
 {
 	init_sockets();
 }
@@ -213,16 +214,25 @@ void ns::AsyncEngine::process_connected_ready(int s, Target const& target, Lvl4S
 		return;
 	}
 
-	// Returns true to go on
-	//         false to remove
-	bool ret = lvl4sm.process_lvl4_data(s, navail, target, host_sm(ipv4));
-	_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " process_lvl4_data returned " << ret << std::endl);
-	lvl4sm.update_ts();
+	bool ret;
+	int err_code = 0;
+	if (lvl4sm.is_buffer_full(navail, _buf_limit)) {
+		err_code = static_cast<int>(errors::BUFFER_LIMIT_REACHED);
+		ret = false;
+		_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " buffer limit reached" << ret << std::endl);
+	}
+	else {
+		// Returns true to go on
+		//         false to remove
+		ret = lvl4sm.process_lvl4_data(s, navail, target, host_sm(ipv4));
+		_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " process_lvl4_data returned " << ret << std::endl);
+		lvl4sm.update_ts();
+	}
 
 	if (ret == false) {
 		_D(BOOST_LOG_TRIVIAL(trace) << ipstr(ipv4) << " free socket!" << std::endl);
 		// Free socket, this is the end for this one!
-		socket_finished(s, 0);
+		socket_finished(s, err_code);
 	}
 }
 
