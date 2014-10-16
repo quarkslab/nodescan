@@ -58,6 +58,9 @@ public:
 	operator Target const&() const { return _t; }
 	Target const& target() const { return _t; }
 
+	bool operator<(ConnectedTarget const& o)  const { return _s <  o._s; }
+	bool operator==(ConnectedTarget const& o) const { return _s == o._s; }
+
 private:
 	Target const& _t;
 	int _s;

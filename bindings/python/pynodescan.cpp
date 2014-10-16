@@ -34,6 +34,7 @@
 #include <ns/action.h>
 #include <ns/target_set.h>
 #include <ns/target_file.h>
+#include <ns/connected_target_properties_storage.h>
 #include <ns/lvl4_properties_storage.h>
 #include <ns/errors.h>
 
@@ -216,6 +217,29 @@ boost::shared_ptr<Lvl4PythonPropertiesStorage> python_properties_init(object con
 {
 	return boost::shared_ptr<Lvl4PythonPropertiesStorage>(new Lvl4PythonPropertiesStorage([type] { return type(); }));
 }
+
+typedef ns::ConnectedTargetPropertiesStorage<boost::python::object> ConnectedTargetPythonPropertiesStorage;
+
+object& ct_python_properties_storage_get(ConnectedTargetPythonPropertiesStorage& s, ns::ConnectedTarget const& t)
+{
+	return s[t];
+}
+
+void ct_python_properties_storage_set(ConnectedTargetPythonPropertiesStorage& s, ns::ConnectedTarget const& t, boost::python::object const& o)
+{
+	s[t] = o;
+}
+
+void ct_python_properties_storage_remove(ConnectedTargetPythonPropertiesStorage& s, ns::ConnectedTarget const& t)
+{
+	s.remove(t);
+}
+
+boost::shared_ptr<ConnectedTargetPythonPropertiesStorage> ct_python_properties_init(object const& type)
+{
+	return boost::shared_ptr<ConnectedTargetPythonPropertiesStorage>(new ConnectedTargetPythonPropertiesStorage([type] { return type(); }));
+}
+
 
 void (ns::AsyncEngine::*async_engine_save_state)(const char* file) = &ns::AsyncEngine::save_state;
 void (ns::AsyncEngine::*async_engine_restore_state)(const char* file) = &ns::AsyncEngine::restore_state;
@@ -410,6 +434,15 @@ BOOST_PYTHON_MODULE(pynodescan)
 		.def("__getitem__", &Lvl4PythonPropertiesStorage::properties_of, return_value_policy<return_by_value>())
 		.def("__getitem__", &python_properties_storage_get, return_value_policy<return_by_value>())
 		.def("__setitem__", &python_properties_storage_set)
+		;
+
+	class_<ConnectedTargetPythonPropertiesStorage, boost::shared_ptr<ConnectedTargetPythonPropertiesStorage>>("ConnectedTargetProperties", no_init)
+		.def("__init__", make_constructor(ct_python_properties_init))
+		.def("remove", &ConnectedTargetPythonPropertiesStorage::remove)
+		.def("remove", &ct_python_properties_storage_remove)
+		.def("__getitem__", &ConnectedTargetPythonPropertiesStorage::properties_of, return_value_policy<return_by_value>())
+		.def("__getitem__", &ct_python_properties_storage_get, return_value_policy<return_by_value>())
+		.def("__setitem__", &ct_python_properties_storage_set)
 		;
 
 	enum_<ns::errors>("errors")

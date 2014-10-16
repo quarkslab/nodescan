@@ -28,10 +28,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef NS_LVL4_PROPERTIES_STORAGE_H
-#define NS_LVL4_PROPERTIES_STORAGE_H
+#ifndef NS_CT_PROPERTIES_STORAGE_H
+#define NS_CT_PROPERTIES_STORAGE_H
 
-#include <ns/target.h>
+#include <ns/connected_target.h>
 #include <ns/properties_storage.h>
 
 #include <map>
@@ -39,9 +39,9 @@
 namespace ns {
 
 template <class Properties>
-class Lvl4PropertiesStorage: public PropertiesStorage<Target, Properties>
+class ConnectedTargetPropertiesStorage: public PropertiesStorage<ConnectedTarget, Properties>
 {
-	typedef PropertiesStorage<Target, Properties> base_type;
+	typedef PropertiesStorage<ConnectedTarget, Properties> base_type;
 
 public:
 	using base_type::base_type;

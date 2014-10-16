@@ -28,23 +28,62 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef NS_LVL4_PROPERTIES_STORAGE_H
-#define NS_LVL4_PROPERTIES_STORAGE_H
-
-#include <ns/target.h>
-#include <ns/properties_storage.h>
+#ifndef NS_PROPERTIES_STORAGE_H
+#define NS_PROPERTIES_STORAGE_H
 
 #include <map>
 
 namespace ns {
 
-template <class Properties>
-class Lvl4PropertiesStorage: public PropertiesStorage<Target, Properties>
+template <class T, class Properties>
+class PropertiesStorage
 {
-	typedef PropertiesStorage<Target, Properties> base_type;
+	typedef T key_type;
+	typedef Properties properties_type;
+	typedef std::map<T, properties_type> storage_type;
 
 public:
-	using base_type::base_type;
+	typedef std::function<properties_type()> func_new_property;
+
+public:
+	PropertiesStorage():
+		_new([] { return properties_type(); })
+	{ }
+
+	PropertiesStorage(func_new_property const& f):
+		_new(f)
+	{ }
+
+
+public:
+	properties_type& properties_of(key_type const& target)
+	{
+		typename storage_type::iterator it = _storage.find(target);
+		if (it != _storage.end()) {
+			return it->second;
+		}
+		return _storage.insert(std::make_pair(target, std::move(_new()))).first->second;
+	}
+
+	properties_type& operator[](key_type const& target) { return properties_of(target); }
+
+	void remove(key_type const& target)
+	{
+		typename storage_type::iterator it = _storage.find(target);
+		if (it != _storage.end()) {
+			_storage.erase(it);
+		}
+	}
+
+	void clear()
+	{
+		_storage->~storage_type();
+		new (&_storage) storage_type();
+	}
+
+private:
+	storage_type _storage;
+	func_new_property _new;
 };
 
 }
