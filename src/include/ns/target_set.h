@@ -73,9 +73,6 @@ class IPV4TargetSet: public TargetSet
 {
 	friend class Engine;
 
-	typedef leeloo::ip_list_intervals::size_type v4_size_type;
-	typedef leeloo::port_list_intervals::size_type port_size_type;
-
 	typedef leeloo::list_intervals_random_promise<leeloo::ip_list_intervals, leeloo::uni> v4_random_state;
 	typedef leeloo::list_intervals_random<leeloo::port_list_intervals, leeloo::uni> port_random_state;
 
